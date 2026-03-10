@@ -1,5 +1,5 @@
 [package]
-name = "smm-helper"
+name = "s-helper"
 version = "0.1.0"
 edition = "2021"
 
@@ -9,5 +9,5 @@ users = "0.11"
 anyhow = "1.0"
 
 [[bin]]
-name = "smm-helper"
+name = "s-helper"
 path = "src/main.rs"

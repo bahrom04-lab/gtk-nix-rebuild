@@ -12,6 +12,6 @@
             <allow_inactive>no</allow_inactive>
             <allow_active>auth_admin_keep</allow_active>
         </defaults>
-        <annotate key="org.freedesktop.policykit.exec.path">@pkglibexecdir@/smm-helper</annotate>
+        <annotate key="org.freedesktop.policykit.exec.path">@pkglibexecdir@/s-helper</annotate>
     </action>
 </policyconfig>

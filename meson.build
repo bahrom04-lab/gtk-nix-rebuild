@@ -64,7 +64,7 @@ endif
 subdir('data')
 subdir('po')
 subdir('src')
-subdir('smm-helper/src')
+subdir('s-helper/src')
 
 
 gnome.post_install(

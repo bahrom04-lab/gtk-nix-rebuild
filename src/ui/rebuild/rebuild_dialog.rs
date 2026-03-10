@@ -185,7 +185,7 @@ impl SimpleComponent for RebuildModel {
                     &[
                         "/usr/bin/env",
                         "pkexec",
-                        &format!("{}/smm-helper", LIBEXECDIR),
+                        &format!("{}/s-helper", LIBEXECDIR),
                         "write-rebuild",
                         "--content",
                         // &output,

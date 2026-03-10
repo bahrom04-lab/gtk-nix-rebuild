@@ -1,6 +1,6 @@
 global_conf = configuration_data()
-cargo_options = [ '--manifest-path', meson.project_source_root() / 'smm-helper' /  'Cargo.toml' ]
-cargo_options += [ '--target-dir', meson.project_build_root() / 'smm-helper' /  'src' ]
+cargo_options = [ '--manifest-path', meson.project_source_root() / 's-helper' /  'Cargo.toml' ]
+cargo_options += [ '--target-dir', meson.project_build_root() / 's-helper' /  'src' ]
 
 if get_option('profile') == 'default'
   cargo_options += [ '--release' ]
@@ -11,13 +11,13 @@ else
   message('Building in debug mode')
 endif
 
-cargo_env = [ 'CARGO_HOME=' + meson.project_build_root() / 'smm-helper' / 'cargo-home' ]
+cargo_env = [ 'CARGO_HOME=' + meson.project_build_root() / 's-helper' / 'cargo-home' ]
 
 cargo_build = custom_target(
   'cargo-build',
   build_by_default: true,
   build_always_stale: true,
-  output: 'smm-helper',
+  output: 's-helper',
   console: true,
   install: true,
   install_dir: get_option('libexecdir'),
@@ -27,6 +27,6 @@ cargo_build = custom_target(
     cargo, 'build',
     cargo_options,
     '&&',
-    'cp', 'smm-helper' / 'src' / rust_target / 'smm-helper', '@OUTPUT@',
+    'cp', 's-helper' / 'src' / rust_target / 's-helper', '@OUTPUT@',
   ]
 )
