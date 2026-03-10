@@ -1,3 +1,4 @@
+use crate::modules::ModuleOption;
 use crate::ui::rebuild::utils::gt_status_msg;
 use crate::{config::LIBEXECDIR, ui::window::AppMsg};
 use relm4::{
@@ -25,7 +26,7 @@ pub struct RebuildModel {
 
 #[derive(Debug)]
 pub enum RebuildInput {
-    Rebuild,
+    Rebuild(HashMap<String, ModuleOption>, String),
     Close,
     SetStatus(RebuildStatus),
 }
@@ -168,17 +169,17 @@ impl SimpleComponent for RebuildModel {
     fn update(&mut self, message: Self::Input, sender: ComponentSender<Self>) {
         self.reset();
         match message {
-            RebuildInput::Rebuild => {
+            RebuildInput::Rebuild(modified_config, moduleconfig) => {
                 println!("todo rebuild");
                 self.set_visible(true);
                 sender.input(RebuildInput::SetStatus(RebuildStatus::Building));
-                // let mut output = moduleconfig;
-                // for (attribute, value) in modified_config {
-                //     output = nix_editor::write::write(&output, &attribute, &value.value())
-                //         .unwrap()
-                //         .to_string();
-                // }
-                // output = nixpkgs_fmt::reformat_string(&output);
+                let mut output = moduleconfig;
+                for (attribute, value) in modified_config {
+                    output = nix_editor::write::write(&output, &attribute, &value.value())
+                        .unwrap()
+                        .to_string();
+                }
+                output = nixpkgs_fmt::reformat_string(&output);
                 self.terminal.spawn_async(
                     vte::PtyFlags::DEFAULT,
                     Some("/"),
@@ -188,7 +189,7 @@ impl SimpleComponent for RebuildModel {
                         &format!("{}/s-helper", LIBEXECDIR),
                         "write-rebuild",
                         "--content",
-                        // &output,
+                        &output,
                         "--path",
                         &self.modulepath.to_string_lossy(),
                         "--",

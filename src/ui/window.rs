@@ -182,14 +182,10 @@ impl SimpleComponent for App {
     fn update(&mut self, message: Self::Input, _sender: ComponentSender<Self>) {
         match message {
             AppMsg::Quit => main_application().quit(),
-            AppMsg::Rebuild => {
-                println!("appmsg::rebuild emit");
-                self.rebuild_dialog.emit(
-                    RebuildInput::Rebuild,
-                    // self.modified_config.clone(),
-                    // self.moduleconfig.clone(),
-                )
-            }
+            AppMsg::Rebuild => self.rebuild_dialog.emit(RebuildInput::Rebuild(
+                self.modified_config.clone(),
+                self.moduleconfig.clone(),
+            )),
             AppMsg::Reload => match reload(&self.config) {
                 Ok(ReloadOutput {
                     modules,
