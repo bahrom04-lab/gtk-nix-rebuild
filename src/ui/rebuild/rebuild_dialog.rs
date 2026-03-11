@@ -1,4 +1,5 @@
 use crate::modules::ModuleOption;
+use crate::modules::load::loadanyconfig;
 use crate::ui::rebuild::utils::gt_status_msg;
 use crate::{config::LIBEXECDIR, ui::window::AppMsg};
 use relm4::{
@@ -9,6 +10,7 @@ use relm4::{
         prelude::{ButtonExt, GtkWindowExt, OrientableExt, WidgetExt},
     },
 };
+use std::path::Path;
 use std::{collections::HashMap, path::PathBuf};
 use tracing::{info, warn};
 use vte::{TerminalExt, TerminalExtManual};
@@ -26,7 +28,8 @@ pub struct RebuildModel {
 
 #[derive(Debug)]
 pub enum RebuildInput {
-    Rebuild(HashMap<String, ModuleOption>, String),
+    // x, y (y is new .nix file in string), z (y path to write)
+    Rebuild(HashMap<String, ModuleOption>, String, String),
     Close,
     SetStatus(RebuildStatus),
 }
@@ -169,17 +172,10 @@ impl SimpleComponent for RebuildModel {
     fn update(&mut self, message: Self::Input, sender: ComponentSender<Self>) {
         self.reset();
         match message {
-            RebuildInput::Rebuild(modified_config, moduleconfig) => {
-                println!("todo rebuild");
+            RebuildInput::Rebuild(modified_config, output, target_config_file) => {
                 self.set_visible(true);
                 sender.input(RebuildInput::SetStatus(RebuildStatus::Building));
-                let mut output = moduleconfig;
-                for (attribute, value) in modified_config {
-                    output = nix_editor::write::write(&output, &attribute, &value.value())
-                        .unwrap()
-                        .to_string();
-                }
-                output = nixpkgs_fmt::reformat_string(&output);
+
                 self.terminal.spawn_async(
                     vte::PtyFlags::DEFAULT,
                     Some("/"),
@@ -191,7 +187,7 @@ impl SimpleComponent for RebuildModel {
                         "--content",
                         &output,
                         "--path",
-                        &self.modulepath.to_string_lossy(),
+                        &target_config_file,
                         "--",
                         "switch",
                         "--flake",

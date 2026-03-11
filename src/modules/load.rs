@@ -1,11 +1,11 @@
 use anyhow::{Context, Result};
-use tracing::log::debug;
 use nix_data::config::configfile::NixDataConfig;
 use std::{
     collections::HashMap,
     fs,
     path::{Path, PathBuf},
 };
+use tracing::log::debug;
 
 use crate::modules::{ModuleData, OptionType};
 
@@ -80,6 +80,10 @@ pub fn loadmoduleconfig(config: &NixDataConfig) -> Result<String> {
         .context("systemconfig parent")?
         .join("modules.nix");
     fs::read_to_string(modulesnix).context("modules.nix")
+}
+
+pub fn loadanyconfig(target_config_file: &PathBuf) -> Result<String> {
+    fs::read_to_string(target_config_file).context("relative_path")
 }
 
 pub fn getmodulepath(config: &NixDataConfig) -> Result<PathBuf> {
