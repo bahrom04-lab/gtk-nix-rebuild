@@ -37,7 +37,6 @@ pkgs.mkShell {
     meson
     ninja
     pango
-    polkit
     gettext
     vte-gtk4
     pkg-config
@@ -51,4 +50,5 @@ pkgs.mkShell {
   # Set Environment Variables
   RUST_BACKTRACE = "full";
   RUST_SRC_PATH = "${pkgs.rust.packages.stable.rustPlatform.rustLibSrc}";
+  PKG_CONFIG_PATH = "${pkgs.polkit.dev}/lib/pkgconfig";
 }
