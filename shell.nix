@@ -43,6 +43,7 @@ pkgs.mkShell {
     gdk-pixbuf
     libadwaita
     pkg-config
+    desktop-file-utils
     wrapGAppsHook4
     rustPlatform.bindgenHook
   ];
