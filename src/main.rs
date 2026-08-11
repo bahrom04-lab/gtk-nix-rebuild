@@ -13,8 +13,8 @@ use relm4::{
 };
 use tracing::error;
 
-use gtk_nix_rebuild::ui::window::{App, AppInit};
 use gtk_nix_rebuild::ui::load::load;
+use gtk_nix_rebuild::ui::window::{App, AppInit};
 
 relm4::new_action_group!(AppActionGroup, "app");
 relm4::new_stateless_action!(QuitAction, AppActionGroup, "quit");
@@ -41,7 +41,7 @@ fn main() {
     gtk::Window::set_default_icon_name(APP_ID);
 
     let app = main_application();
-    app.set_resource_base_path(Some("/net/bleur/GtkRustTemplate/"));
+    app.set_resource_base_path(Some("/io/github/bahrom04-lab/"));
 
     let mut actions = RelmActionGroup::<AppActionGroup>::new();
 
@@ -60,7 +60,7 @@ fn main() {
 
     let data = res
         .lookup_data(
-            "/net/bleur/GtkRustTemplate/style.css",
+            "/io/github/bahrom04-lab/style.css",
             gio::ResourceLookupFlags::NONE,
         )
         .unwrap();

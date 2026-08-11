@@ -1,34 +1,16 @@
-{
-  pkgs ? let
-    lock = (builtins.fromJSON (builtins.readFile ./flake.lock)).nodes.nixpkgs.locked;
-    nixpkgs = fetchTarball {
-      url = "https://github.com/nixos/nixpkgs/archive/${lock.rev}.tar.gz";
-      sha256 = lock.narHash;
-    };
-  in
-    import nixpkgs {overlays = [];},
-  crane,
-  ...
-}: let
-  # Helpful nix function
-  lib = pkgs.lib;
-  getLibFolder = pkg: "${pkg}/lib";
+{ pkgs, lib, ... }:
+pkgs.stdenv.mkDerivation {
+  pname = "gtk-nix-rebuild";
+  version = "0.1.0";
 
-  # Manifest via Cargo.toml
-  manifest = (pkgs.lib.importTOML ./Cargo.toml).package;
+  src = [ ./. ];
 
-  craneLib = crane.mkLib pkgs;
+  cargoDeps = pkgs.rustPlatform.fetchCargoVendor {
+    src = ./.;
+    hash = "";
+  };
 
-  commonBuildInputs = with pkgs; [
-    gtk4
-    libadwaita
-    desktop-file-utils
-    openssl
-    rustPlatform.bindgenHook
-    vte-gtk4
-  ];
-
-  commonNativeBuildInputs = with pkgs; [
+  nativeBuildInputs = with pkgs; [
     appstream
     appstream-glib
     desktop-file-utils
@@ -41,49 +23,13 @@
     openssl
   ];
 
-  cargoArtifacts = craneLib.buildDepsOnly {
-    src = craneLib.cleanCargoSource ./.;
-    strictDeps = true;
+  buildInputs = with pkgs; [
+    gtk4
+    libadwaita
+    desktop-file-utils
+    openssl
+    rustPlatform.bindgenHook
+    vte-gtk4
+  ];
 
-    nativeBuildInputs = commonNativeBuildInputs;
-    buildInputs = commonBuildInputs;
-  };
-in
-  craneLib.buildPackage {
-    # pkgs.stdenv.mkDerivation {
-    pname = manifest.name;
-    version = manifest.version;
-    strictDeps = true;
-
-    src = pkgs.lib.cleanSource ./.;
-    # src = craneLib.cleanCargoSource ./.;
-
-    cargoDeps = pkgs.rustPlatform.importCargoLock {
-      lockFile = ./Cargo.lock;
-    };
-
-    inherit cargoArtifacts;
-
-    nativeBuildInputs = commonNativeBuildInputs;
-    buildInputs = commonBuildInputs;
-
-    configurePhase = ''
-      mesonConfigurePhase
-      runHook postConfigure
-    '';
-
-    buildPhase = ''
-      runHook preBuild
-      ninjaBuildPhase
-      runHook postBuild
-    '';
-
-    installPhase = ''
-      runHook preInstall
-      mesonInstallPhase
-      runHook postInstall
-    '';
-
-    doNotPostBuildInstallCargoBinaries = true;
-    checkPhase = false;
-  }
+}

@@ -88,7 +88,7 @@ impl SimpleComponent for App {
 
             #[wrap(Some)]
             set_help_overlay: shortcuts = &gtk::Builder::from_resource(
-                    "/net/bleur/GtkRustTemplate/gtk/help-overlay.ui"
+                    "/io/github/bahrom04-lab/gtk/help-overlay.ui"
                 )
                 .object::<gtk::ShortcutsWindow>("help_overlay")
                 .unwrap() -> gtk::ShortcutsWindow {
