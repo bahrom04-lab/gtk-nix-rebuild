@@ -10,7 +10,6 @@ use relm4::{
         prelude::{ButtonExt, GtkWindowExt, OrientableExt, WidgetExt},
     },
 };
-use std::path::Path;
 use std::{collections::HashMap, path::PathBuf};
 use tracing::{info, warn};
 use vte::{TerminalExt, TerminalExtManual};
@@ -29,7 +28,7 @@ pub struct RebuildModel {
 #[derive(Debug)]
 pub enum RebuildInput {
     // x, y (y is new .nix file in string), z (y path to write)
-    Rebuild(HashMap<String, ModuleOption>, String, String),
+    Rebuild(String, String),
     Close,
     SetStatus(RebuildStatus),
 }
@@ -172,7 +171,7 @@ impl SimpleComponent for RebuildModel {
     fn update(&mut self, message: Self::Input, sender: ComponentSender<Self>) {
         self.reset();
         match message {
-            RebuildInput::Rebuild(modified_config, output, target_config_file) => {
+            RebuildInput::Rebuild(output, target_config_file_path) => {
                 self.set_visible(true);
                 sender.input(RebuildInput::SetStatus(RebuildStatus::Building));
 
@@ -187,7 +186,7 @@ impl SimpleComponent for RebuildModel {
                         "--content",
                         &output,
                         "--path",
-                        &target_config_file,
+                        &target_config_file_path,
                         "--",
                         "switch",
                         "--flake",

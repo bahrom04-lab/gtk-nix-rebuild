@@ -10,8 +10,9 @@ use relm4::{
     },
     main_application,
 };
-use std::{collections::HashMap, convert::identity, fs, path::Path};
+use std::{collections::HashMap, convert::identity, fs};
 
+use crate::ui::{load::reload, rebuild::rebuild_dialog::RebuildInput};
 use crate::{
     config::{APP_ID, PROFILE},
     ui::rebuild::rebuild_dialog::{RebuildInit, RebuildModel},
@@ -22,10 +23,6 @@ use crate::{
         about::AboutDialog,
         load::{LoadOutput, ReloadOutput},
     },
-};
-use crate::{
-    modules::load::loadanyconfig,
-    ui::{load::reload, rebuild::rebuild_dialog::RebuildInput},
 };
 use nix_data::config::configfile::NixDataConfig;
 
@@ -49,15 +46,10 @@ pub enum AppMsg {
     // CloseModulePage,
     // SetModuleOption,
     // ApplyChanges,
-    Rebuild(String, String, String), // single line nix path, argument and value
+    Rebuild(String, String), // single line nix path, argument and value
     Reload,
     Quit,
 }
-
-relm4::new_action_group!(pub WindowActionGroup, "win");
-relm4::new_stateless_action!(PreferencesAction, WindowActionGroup, "preferences");
-relm4::new_stateless_action!(ShortcutsAction, WindowActionGroup, "show-help-overlay");
-relm4::new_stateless_action!(AboutAction, WindowActionGroup, "about");
 
 #[relm4::component(pub)]
 impl SimpleComponent for App {
@@ -79,7 +71,6 @@ impl SimpleComponent for App {
     view! {
         main_window = adw::ApplicationWindow::new(&main_application()) {
             set_visible: true,
-
             connect_close_request[sender] => move |_| {
                 sender.input(AppMsg::Quit);
                 glib::Propagation::Stop
@@ -94,7 +85,6 @@ impl SimpleComponent for App {
                     set_transient_for: Some(&main_window),
                     set_application: Some(&main_application()),
             },
-
             add_css_class?: if PROFILE == "Devel" {
                     Some("devel")
                 } else {
@@ -103,33 +93,28 @@ impl SimpleComponent for App {
 
             gtk::Box {
                 set_orientation: gtk::Orientation::Vertical,
-
                 adw::HeaderBar {
                     pack_end = &gtk::MenuButton {
                         set_icon_name: "open-menu-symbolic",
                         set_menu_model: Some(&primary_menu),
                     }
                 },
-
                 gtk::Label {
                     set_label: "Hello world!",
                     add_css_class: "title-header",
                     set_vexpand: true,
                 },
-
                 gtk::Button {
                     set_label: "rebuild",
                     add_css_class: "suggested-action",
                     connect_clicked[sender] => move |_a| {
                         sender.input(AppMsg::Rebuild(
-                            "modules/nixos/l10n/default.nix".to_string(),
                             "i18n.defaultLocale".to_string(),
                             "uz_UZ.UTF-8".to_string())
                         )
                     }
                 },
             }
-
         }
     }
 
@@ -167,21 +152,12 @@ impl SimpleComponent for App {
         let widgets = view_output!();
 
         let mut actions = RelmActionGroup::<WindowActionGroup>::new();
-
-        let shortcuts_action = {
-            let shortcuts = widgets.shortcuts.clone();
-            RelmAction::<ShortcutsAction>::new_stateless(move |_| {
-                shortcuts.present();
-            })
-        };
-
         let about_action = {
             RelmAction::<AboutAction>::new_stateless(move |_| {
                 AboutDialog::builder().launch(()).detach();
             })
         };
-
-        actions.add_action(shortcuts_action);
+        // actions.add_action(shortcuts_action);
         actions.add_action(about_action);
         actions.register_for_widget(&widgets.main_window);
 
@@ -193,20 +169,14 @@ impl SimpleComponent for App {
     fn update(&mut self, message: Self::Input, _sender: ComponentSender<Self>) {
         match message {
             AppMsg::Quit => main_application().quit(),
-            AppMsg::Rebuild(relative_config_path, argument, value) => {
-                // path to be written arg and val usually inside ./modules/nixos/. not configuration.nix
-                let full_config_path = Path::new(&self.config.flake.clone().unwrap())
-                    .parent()
-                    .context("systemconfig parent")
-                    .unwrap()
-                    .join(relative_config_path);
+            AppMsg::Rebuild(argument, value) => {
+                let configuration_nix: String = self.config.systemconfig.clone().unwrap();
 
                 // String type readed file. e.x: {}, "{...}:\n{\n  i18n.defaultLocale..
-                let full_config_string = fs::read_to_string(&full_config_path)
+                let full_config_string = fs::read_to_string(&configuration_nix)
                     .context("String type readed file")
                     .unwrap();
 
-                // new changed file to be written in s-helper and saved/overwritten
                 let output = nixpkgs_fmt::reformat_string(
                     &nix_editor::write::write(
                         &full_config_string,
@@ -215,12 +185,8 @@ impl SimpleComponent for App {
                     )
                     .unwrap(),
                 );
-
-                self.rebuild_dialog.emit(RebuildInput::Rebuild(
-                    self.modified_config.clone(),
-                    output.to_owned(),
-                    full_config_path.into_os_string().into_string().unwrap(),
-                ))
+                self.rebuild_dialog
+                    .emit(RebuildInput::Rebuild(output.to_owned(), configuration_nix))
             }
             AppMsg::Reload => match reload(&self.config) {
                 Ok(ReloadOutput {
@@ -277,3 +243,8 @@ impl AppWidgets {
         }
     }
 }
+
+relm4::new_action_group!(pub WindowActionGroup, "win");
+relm4::new_stateless_action!(PreferencesAction, WindowActionGroup, "preferences");
+relm4::new_stateless_action!(ShortcutsAction, WindowActionGroup, "show-help-overlay");
+relm4::new_stateless_action!(AboutAction, WindowActionGroup, "about");
