@@ -3,11 +3,11 @@ pkgs.stdenv.mkDerivation {
   pname = "gtk-nix-rebuild";
   version = "0.1.0";
 
-  src = [ ./. ];
+  src = ./.;
 
   cargoDeps = pkgs.rustPlatform.fetchCargoVendor {
     src = ./.;
-    hash = "";
+    hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
   };
 
   nativeBuildInputs = with pkgs; [
