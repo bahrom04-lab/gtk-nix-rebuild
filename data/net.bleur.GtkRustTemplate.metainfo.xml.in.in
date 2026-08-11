@@ -12,16 +12,16 @@
   </description>
   <screenshots>
     <screenshot type="default">
-      <image>https://gitlab.gnome.org/bilelmoussaoui/gtk-rust-template/raw/master/data/resources/screenshots/screenshot1.png</image>
+      <image>https://gitlab.gnome.org/bilelmoussaoui/gtk-nix-rebuild/raw/master/data/resources/screenshots/screenshot1.png</image>
       <caption>Main window</caption>
     </screenshot>
   </screenshots>
-  <url type="homepage">https://gitlab.gnome.org/bilelmoussaoui/gtk-rust-template</url>
-  <url type="bugtracker">https://gitlab.gnome.org/bilelmoussaoui/gtk-rust-template/issues</url>
+  <url type="homepage">https://gitlab.gnome.org/bilelmoussaoui/gtk-nix-rebuild</url>
+  <url type="bugtracker">https://gitlab.gnome.org/bilelmoussaoui/gtk-nix-rebuild/issues</url>
   <!-- Source code repository -->
-  <url type="vcs-browser">https://gitlab.gnome.org/bilelmoussaoui/gtk-rust-template</url>
+  <url type="vcs-browser">https://gitlab.gnome.org/bilelmoussaoui/gtk-nix-rebuild</url>
   <!-- Translation repository -->
-  <url type="translate">https://gitlab.gnome.org/bilelmoussaoui/gtk-rust-template/-/tree/master/po</url>
+  <url type="translate">https://gitlab.gnome.org/bilelmoussaoui/gtk-nix-rebuild/-/tree/master/po</url>
   <!-- Open Age Ratings Service:
        https://hughsie.github.io/oars/generate.html
   -->

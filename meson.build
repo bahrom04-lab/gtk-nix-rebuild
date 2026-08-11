@@ -1,5 +1,5 @@
 project(
-  'gtk-rust-template',
+  'gtk-nix-rebuild',
   'rust',
   version: '0.1.0',
   meson_version: '>= 0.59',

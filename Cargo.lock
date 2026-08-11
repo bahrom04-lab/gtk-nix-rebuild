@@ -1125,7 +1125,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "gtk-rust-template"
+name = "gtk-nix-rebuild"
 version = "0.1.0"
 dependencies = [
  "anyhow",

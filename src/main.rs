@@ -2,7 +2,7 @@
 // mod config;
 // mod ui;
 
-use gtk_rust_template::config::{APP_ID, GETTEXT_PACKAGE, LOCALEDIR, RESOURCES_FILE};
+use gtk_nix_rebuild::config::{APP_ID, GETTEXT_PACKAGE, LOCALEDIR, RESOURCES_FILE};
 use gettextrs::{LocaleCategory, gettext};
 use gtk::prelude::ApplicationExt;
 use gtk::{gio, glib};
@@ -13,8 +13,8 @@ use relm4::{
 };
 use tracing::error;
 
-use gtk_rust_template::ui::window::{App, AppInit};
-use gtk_rust_template::ui::load::load;
+use gtk_nix_rebuild::ui::window::{App, AppInit};
+use gtk_nix_rebuild::ui::load::load;
 
 relm4::new_action_group!(AppActionGroup, "app");
 relm4::new_stateless_action!(QuitAction, AppActionGroup, "quit");

@@ -19,9 +19,9 @@ impl SimpleComponent for AboutDialog {
             // Insert your license of choice here
             // .license_type(gtk::License::MitX11)
             // Insert your website here
-            // .website("https://gitlab.gnome.org/bilelmoussaoui/gtk-rust-template/")
+            // .website("https://gitlab.gnome.org/bilelmoussaoui/gtk-nix-rebuild/")
             // Insert your Issues page
-            // .issue_url("https://gitlab.gnome.org/World/Rust/gtk-rust-template/-/issues")
+            // .issue_url("https://gitlab.gnome.org/World/Rust/gtk-nix-rebuild/-/issues")
             // Insert your application name here
             .application_name("Relm4 Template")
             .version(VERSION)
