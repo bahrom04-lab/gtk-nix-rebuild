@@ -1,11 +1,7 @@
-#[rustfmt::skip]
-// mod config;
-// mod ui;
-
-use gtk_nix_rebuild::config::{APP_ID, GETTEXT_PACKAGE, LOCALEDIR, RESOURCES_FILE};
-use gettextrs::{LocaleCategory, gettext};
+use gettextrs::gettext;
 use gtk::prelude::ApplicationExt;
 use gtk::{gio, glib};
+use gtk_nix_rebuild::config::{APP_ID, GETTEXT_PACKAGE, LOCALEDIR, RESOURCES_FILE};
 use relm4::{RelmApp, gtk, main_application};
 use tracing::error;
 
@@ -17,7 +13,6 @@ relm4::new_stateless_action!(QuitAction, AppActionGroup, "quit");
 
 fn setup_locale() {
     // setup gettext
-    gettextrs::setlocale(LocaleCategory::LcAll, "");
     gettextrs::bindtextdomain(GETTEXT_PACKAGE, LOCALEDIR).expect("Unable to bind the text domain");
     gettextrs::textdomain(GETTEXT_PACKAGE).expect("Unable to switch to the text domain");
 
