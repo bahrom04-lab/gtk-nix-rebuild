@@ -75,16 +75,6 @@ impl SimpleComponent for App {
                 sender.input(AppMsg::Quit);
                 glib::Propagation::Stop
             },
-
-            #[wrap(Some)]
-            set_help_overlay: shortcuts = &gtk::Builder::from_resource(
-                    "/io/github/bahrom04-lab/gtk/help-overlay.ui"
-                )
-                .object::<gtk::ShortcutsWindow>("help_overlay")
-                .unwrap() -> gtk::ShortcutsWindow {
-                    set_transient_for: Some(&main_window),
-                    set_application: Some(&main_application()),
-            },
             add_css_class?: if PROFILE == "Devel" {
                     Some("devel")
                 } else {
