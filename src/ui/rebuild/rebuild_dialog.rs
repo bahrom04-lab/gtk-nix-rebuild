@@ -1,5 +1,3 @@
-use crate::modules::ModuleOption;
-use crate::modules::load::loadanyconfig;
 use crate::ui::rebuild::utils::gt_status_msg;
 use crate::{config::LIBEXECDIR, ui::window::AppMsg};
 use relm4::{
@@ -10,7 +8,7 @@ use relm4::{
         prelude::{ButtonExt, GtkWindowExt, OrientableExt, WidgetExt},
     },
 };
-use std::{collections::HashMap, path::PathBuf};
+use std::path::PathBuf;
 use tracing::{info, warn};
 use vte::{TerminalExt, TerminalExtManual};
 

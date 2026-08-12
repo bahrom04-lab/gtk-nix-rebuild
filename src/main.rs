@@ -6,11 +6,7 @@ use gtk_nix_rebuild::config::{APP_ID, GETTEXT_PACKAGE, LOCALEDIR, RESOURCES_FILE
 use gettextrs::{LocaleCategory, gettext};
 use gtk::prelude::ApplicationExt;
 use gtk::{gio, glib};
-use relm4::{
-    RelmApp,
-    actions::{AccelsPlus, RelmAction, RelmActionGroup},
-    gtk, main_application,
-};
+use relm4::{RelmApp, gtk, main_application};
 use tracing::error;
 
 use gtk_nix_rebuild::ui::load::load;
@@ -26,6 +22,15 @@ fn setup_locale() {
     gettextrs::textdomain(GETTEXT_PACKAGE).expect("Unable to switch to the text domain");
 
     glib::set_application_name(&gettext("GTK Rust Template"));
+    let res = gio::Resource::load(RESOURCES_FILE).expect("Could not load gresource file");
+    gio::resources_register(&res);
+    let data = res
+        .lookup_data(
+            "/io/github/bahrom04-lab/style.css",
+            gio::ResourceLookupFlags::NONE,
+        )
+        .unwrap();
+    relm4::set_global_css(&glib::GString::from_utf8_checked(data.to_vec()).unwrap());
 }
 
 fn main() {
@@ -38,8 +43,6 @@ fn main() {
     gtk::init().unwrap();
     gtk::Window::set_default_icon_name(APP_ID);
     setup_locale();
-    let res = gio::Resource::load(RESOURCES_FILE).expect("Could not load gresource file");
-    gio::resources_register(&res);
 
     let app = main_application();
     app.set_resource_base_path(Some("/io/github/bahrom04-lab/"));
@@ -55,16 +58,7 @@ fn main() {
     // actions.register_for_main_application();
     // app.set_accelerators_for_action::<QuitAction>(&["<Control>q"]);
 
-
     let app = RelmApp::from_app(app);
-    let data = res
-        .lookup_data(
-            "/io/github/bahrom04-lab/style.css",
-            gio::ResourceLookupFlags::NONE,
-        )
-        .unwrap();
-    relm4::set_global_css(&glib::GString::from_utf8_checked(data.to_vec()).unwrap());
-
     match load() {
         Ok(load) => app.run::<App>(AppInit { load }),
         Err(e) => {
