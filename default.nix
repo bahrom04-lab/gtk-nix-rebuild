@@ -11,6 +11,8 @@ pkgs.stdenv.mkDerivation {
   };
 
   nativeBuildInputs = with pkgs; [
+    rustc
+    cargo
     appstream
     appstream-glib
     desktop-file-utils
