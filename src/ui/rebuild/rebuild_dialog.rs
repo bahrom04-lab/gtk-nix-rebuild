@@ -1,4 +1,3 @@
-use crate::ui::rebuild::utils::gt_status_msg;
 use crate::{config::LIBEXECDIR, ui::window::AppMsg};
 use relm4::{
     ComponentParts, ComponentSender, SimpleComponent,
@@ -10,17 +9,17 @@ use relm4::{
 };
 use std::path::PathBuf;
 use tracing::{info, warn};
-use vte::{TerminalExt, TerminalExtManual};
+use vte::{CancellableExt, TerminalExt, TerminalExtManual};
 
 #[tracker::track]
 pub struct RebuildModel {
-    visible: bool,
-    status: RebuildStatus,
-    terminal: vte::Terminal,
-
     flakepath: PathBuf,
     modulepath: PathBuf,
     generations: Option<u32>,
+    visible: bool,
+    status: RebuildStatus,
+    terminal: vte::Terminal,
+    cancellable: Option<gio::Cancellable>,
 }
 
 #[derive(Debug)]
@@ -29,6 +28,7 @@ pub enum RebuildInput {
     Rebuild(String, String),
     Close,
     SetStatus(RebuildStatus),
+    Cansel,
 }
 
 pub struct RebuildInit {
@@ -71,7 +71,14 @@ impl SimpleComponent for RebuildModel {
                             gtk::Spinner {
                                 set_spinning: true,
                                 set_height_request: 32,
-                            }
+                            },
+                            gtk::Button {
+                                set_label: "cansel",
+                                // add_css_class: "suggested-action",
+                                connect_clicked[sender] => move |_a| {
+                                    sender.input(RebuildInput::Cansel)
+                                }
+                            },
                         },
                         RebuildStatus::Success => {
                             gtk::Image {
@@ -159,6 +166,7 @@ impl SimpleComponent for RebuildModel {
             flakepath: init.flakepath,
             modulepath: init.modulepath,
             generations: init.generations,
+            cancellable: None,
             tracker: 0,
         };
         let terminal = &model.terminal;
@@ -172,6 +180,9 @@ impl SimpleComponent for RebuildModel {
             RebuildInput::Rebuild(output, target_config_file_path) => {
                 self.set_visible(true);
                 sender.input(RebuildInput::SetStatus(RebuildStatus::Building));
+
+                let cancellabel = gio::Cancellable::new();
+                self.set_cancellable(Some(cancellabel.clone()));
 
                 self.terminal.spawn_async(
                     vte::PtyFlags::DEFAULT,
@@ -194,8 +205,8 @@ impl SimpleComponent for RebuildModel {
                     glib::SpawnFlags::DEFAULT,
                     || (),
                     -1,
-                    gio::Cancellable::NONE,
-                    |_| (),
+                    Some(&cancellabel),
+                    |_a| (),
                 );
             }
             RebuildInput::Close => {
@@ -216,6 +227,12 @@ impl SimpleComponent for RebuildModel {
             }
             RebuildInput::SetStatus(status) => {
                 self.set_status(status);
+            }
+            RebuildInput::Cansel => {
+                if let Some(cansel) = self.cancellable.take() {
+                    cansel.cancel();
+                }
+                self.terminal.reset(true, true);
             }
         }
     }
